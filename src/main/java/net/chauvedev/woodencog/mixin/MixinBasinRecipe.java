@@ -5,7 +5,6 @@ import com.simibubi.create.content.processing.basin.BasinBlockEntity;
 import com.simibubi.create.content.processing.basin.BasinOperatingBlockEntity;
 import com.simibubi.create.content.processing.basin.BasinRecipe;
 import com.simibubi.create.foundation.recipe.RecipeFinder;
-import net.chauvedev.woodencog.WoodenCog;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -35,8 +34,14 @@ public abstract class MixinBasinRecipe extends KineticBlockEntity {
         } else {
             List<Recipe<?>> list = RecipeFinder.get(this.getRecipeCacheKey(), this.level, this::matchStaticFilters);
             return list.stream().filter(this::matchBasinRecipe).sorted((r1, r2) -> {
-                int r1Size = (r1.getIngredients().size() + ((BasinRecipe)r1).getFluidIngredients().size());
-                int r2Size = (r2.getIngredients().size() + ((BasinRecipe)r2).getFluidIngredients().size());
+                int r1Size = r1.getIngredients().size();
+                int r2Size = r2.getIngredients().size();
+                if (r1 instanceof BasinRecipe) {
+                    r1Size += ((BasinRecipe)r1).getFluidIngredients().size();
+                }
+                if (r2 instanceof BasinRecipe) {
+                    r2Size += ((BasinRecipe)r2).getFluidIngredients().size();
+                }
                 return r2Size - r1Size;
             }).collect(Collectors.toList());
         }
